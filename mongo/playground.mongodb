@@ -1,0 +1,14 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('wordstore');
+
+// Insert a few documents into the sales collection.
+db.words.insertMany([
+  { 'id': 11, 'text': "pencil", 'translatedText': "kalem",'language' :"en_US",'createdAt': new Date('2021-02-01T08:00:00Z') },
+]);
+
+db.sales.find({ date: { $gte: new Date('2014-03-01'), $lt: new Date('2014-04-05') } });
