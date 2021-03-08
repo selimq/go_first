@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -253,7 +254,12 @@ func handleRequests() {
 
 	api.HandleFunc("/user/{userID}/comment/{commentID}", params).Methods(http.MethodGet)*/
 
-	log.Fatal(http.ListenAndServe(":50000", r))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println(port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 
 }
 func init() {
