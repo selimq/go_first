@@ -218,6 +218,14 @@ func deleteWord(w http.ResponseWriter, r *http.Request) {
 	log.Println(result)
 
 }
+func listAllWords(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Listing All Words..")
+	words := mon.ReturnWords(client, bson.M{})
+	json.NewEncoder(w).Encode(words)
+
+}
 func handleRequests() {
 	println("localhost:8080 ...")
 	r := mux.NewRouter()
@@ -232,6 +240,8 @@ func handleRequests() {
 	api.HandleFunc("/word", postWord).Methods((http.MethodPost))
 	//delete word
 	api.HandleFunc("/word/{ID}", deleteWord).Methods((http.MethodDelete))
+	//list all
+	api.HandleFunc("/word", listAllWords).Methods((http.MethodGet))
 	/*//create
 	api.HandleFunc("/persons/create", postPerson).Methods((http.MethodPost))
 	//list all
