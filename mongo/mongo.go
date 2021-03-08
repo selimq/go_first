@@ -76,6 +76,19 @@ func InsertNewWord(client *mongo.Client, word lib.Word) (interface{}, error) {
 	return insertResult.InsertedID, nil
 }
 
+//DeleteWord ..
+func DeleteWord(client *mongo.Client, filter bson.M) (interface{}, error) {
+	collection := client.Database("wordstore").Collection(("words"))
+	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		log.Fatalln("Error on delete Word", err)
+		return nil, err
+	}
+	log.Println("Delete succeed")
+
+	return deleteResult.DeletedCount, nil
+}
+
 //ReturnWords ..
 func ReturnWords(client *mongo.Client, filter bson.M) []*lib.Word {
 	var words []*lib.Word

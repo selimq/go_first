@@ -181,8 +181,41 @@ func postWord(w http.ResponseWriter, r *http.Request) {
 	insertedID, err := mon.InsertNewWord(client, word)
 	if err != nil {
 		log.Fatal("Error")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	log.Println(insertedID)
+
+}
+func deleteWord(w http.ResponseWriter, r *http.Request) {
+
+	pathParams := mux.Vars(r)
+
+	ID := -1
+	var err error
+	if val, ok := pathParams["ID"]; ok {
+		ID, err = strconv.Atoi(val)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"Error": "need a ID"}`))
+			return
+		}
+	}
+	println(ID)
+	result, err := mon.DeleteWord(client, bson.M{"ID": ID})
+	if err != nil {
+		log.Fatal(err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
+	log.Println(result)
 
 }
 func handleRequests() {
@@ -195,8 +228,10 @@ func handleRequests() {
 	api.HandleFunc("", put).Methods(http.MethodPut)
 	api.HandleFunc("", delete).Methods(http.MethodDelete)
 
-	//create words
+	//create word
 	api.HandleFunc("/word", postWord).Methods((http.MethodPost))
+	//delete word
+	api.HandleFunc("/word/{ID}", deleteWord).Methods((http.MethodDelete))
 	/*//create
 	api.HandleFunc("/persons/create", postPerson).Methods((http.MethodPost))
 	//list all
@@ -219,10 +254,10 @@ var client *mongo.Client
 
 func main() {
 	client = mon.GetClient()
-	words := mon.ReturnWords(client, bson.M{"Text": "door"})
+	/*words := mon.ReturnWords(client, bson.M{"Text": "door"})
 	for _, word := range words {
 		log.Println(word.Text)
-	}
+	}*/
 	handleRequests()
 	/* collection, context :=  mongo.Baglan()
 
