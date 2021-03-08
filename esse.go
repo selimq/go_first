@@ -253,7 +253,7 @@ func handleRequests() {
 
 	api.HandleFunc("/user/{userID}/comment/{commentID}", params).Methods(http.MethodGet)*/
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":50000", r))
 
 }
 func init() {
