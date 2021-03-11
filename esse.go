@@ -220,10 +220,11 @@ func deleteWord(w http.ResponseWriter, r *http.Request) {
 
 }
 func listAllWords(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	log.Println("Listing All Words..")
 	words := mon.ReturnWords(client, bson.M{})
+	print(words[3].TranslatedText)
 	json.NewEncoder(w).Encode(words)
 
 }
