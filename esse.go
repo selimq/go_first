@@ -195,19 +195,9 @@ func deleteWord(w http.ResponseWriter, r *http.Request) {
 
 	pathParams := mux.Vars(r)
 
-	ID := -1
-	var err error
-	if val, ok := pathParams["ID"]; ok {
-		ID, err = strconv.Atoi(val)
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"Error": "need a ID"}`))
-			return
-		}
-	}
-	println(ID)
-	result, err := mon.DeleteWord(client, bson.M{"ID": ID})
+	str := pathParams["str"]
+	println(str)
+	result, err := mon.DeleteWord(client, bson.M{"Text": str})
 	if err != nil {
 		log.Fatal(err)
 		w.Header().Set("Content-Type", "application/json")
@@ -241,7 +231,7 @@ func handleRequests() {
 	//create word
 	api.HandleFunc("/word", postWord).Methods((http.MethodPost))
 	//delete word
-	api.HandleFunc("/word/{ID}", deleteWord).Methods((http.MethodDelete))
+	api.HandleFunc("/word/{str}", deleteWord).Methods((http.MethodDelete))
 	//list all
 	api.HandleFunc("/word", listAllWords).Methods((http.MethodGet))
 	/*//create
