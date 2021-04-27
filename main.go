@@ -258,8 +258,10 @@ func main() {
 	pipe := database.Client.TxPipeline()
 	pipe.Set(ctx, "key", "value", 0)
 	pipe.Set(ctx, "isim", "esse", 0)
-	results, err := pipe.Exec(ctx)
-	print(results)
+	pipe.Exec(ctx)
+
+	deger := pipe.Get(ctx, "esra")
+	print(deger)
 
 	//!
 	//handleRequests()
