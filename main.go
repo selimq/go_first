@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,45 +12,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/selimq/go1/lib"
+	"github.com/selimq/go1/lib/crud"
+	"github.com/selimq/go1/lib/redis"
 	mon "github.com/selimq/go1/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+//enableCors is for api requests
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-}
-
-func get(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "get called"}`))
-}
-
-/*
-func get1(writer http.ResponseWriter, req *http.Request) {
-	writer.Header().Set("Content-Type", "text/plain")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(lib.Read()) //read
-}*/
-
-func post(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(`{"message": "post called"}`))
-
-}
-
-func put(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte(`{"message": "put called"}`))
-}
-
-func delete(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "delete called"}`))
 }
 
 func params(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +73,7 @@ func examp() {
 	println(body)
 
 }*/
+
 //Persons list of lib:Person
 var Persons []lib.Person
 
@@ -176,7 +149,6 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 func RemoveIndex(s []lib.Person, index int) []lib.Person {
 	return append(s[:index], s[index+1:]...)
 }
-
 func postWord(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -226,14 +198,15 @@ func listAllWords(w http.ResponseWriter, r *http.Request) {
 
 }
 func handleRequests() {
-	println("localhost:8080 ...")
+	println("localhost:10000 ...")
 	r := mux.NewRouter()
 
 	api := r.PathPrefix("/api/v1").Subrouter()
-	api.HandleFunc("", get).Methods(http.MethodGet)
-	api.HandleFunc("", post).Methods(http.MethodPost)
-	api.HandleFunc("", put).Methods(http.MethodPut)
-	api.HandleFunc("", delete).Methods(http.MethodDelete)
+
+	api.HandleFunc("", crud.Get).Methods(http.MethodGet)
+	api.HandleFunc("", crud.Post).Methods(http.MethodPost)
+	api.HandleFunc("", crud.Put).Methods(http.MethodPut)
+	api.HandleFunc("", crud.Delete).Methods(http.MethodDelete)
 
 	//create word
 	api.HandleFunc("/word", postWord).Methods((http.MethodPost))
@@ -252,6 +225,8 @@ func handleRequests() {
 
 	api.HandleFunc("/user/{userID}/comment/{commentID}", params).Methods(http.MethodGet)*/
 
+	//Heroku vb sitelere yüklendiginde otomatik port seçmesi için
+	//eğer yok ise yani lokal ise 10000 olarak atanır
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "10000"
@@ -261,26 +236,45 @@ func handleRequests() {
 
 }
 func init() {
-	println("İnit")
+	println("Init state")
 }
 
 var client *mongo.Client
 
 func main() {
-	client = mon.GetClient()
+	//	client = mon.GetClient()
 	/*words := mon.ReturnWords(client, bson.M{"Text": "door"})
 	for _, word := range words {
 		log.Println(word.Text)
 	}*/
-	handleRequests()
-	/* collection, context :=  mongo.Baglan()
 
-	ali := lib.Person{ID: 2, Ad: "Ali"}
-	a := lib.Person{ID: 1, Ad: "AA"}
-	Persons = append(Persons, ali, a)
-	println(Persons)
-	//go handleRequests()
-	//	v := lib.Word{ID: 54, Text: "droor", TranslatedText: "kapı", CreatedAt: time.Now(), Language: "en_US"}
-	//	mongo.CreateWord(&v)
-	mongo.CreateWord(context, *collection)*/
+	ctx := context.Background()
+
+	database, err := redis.NewDatabase("127.0.0.1:6379")
+	if err != nil {
+		log.Fatalf("Failed to connect to redis: %s", err.Error())
+	}
+
+	pipe := database.Client.TxPipeline()
+	pipe.Set(ctx, "key", "value", 0)
+	pipe.Set(ctx, "isim", "esse", 0)
+	results, err := pipe.Exec(ctx)
+	print(results)
+
+	//!
+	//handleRequests()
+
+	//  collection, context :=  mongo.Baglan()
+	/*
+		ali := lib.Person{ID: 2, Ad: "Ali"}
+		a := lib.Person{ID: 1, Ad: "AA"}
+		Persons = append(Persons, ali, a)
+		println(Persons)
+		//go handleRequests()
+		//	v := lib.Word{ID: 54, Text: "droor", TranslatedText: "kapı", CreatedAt: time.Now(), Language: "en_US"}
+		//	mongo.CreateWord(&v)
+		mongo.CreateWord(context, *collection)*
+
+	*/
+
 }

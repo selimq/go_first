@@ -4,38 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/selimq/go1/lib"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-//Baglan is for connect mongo db server
-func Baglan() (*mongo.Collection, context.Context) {
-	// Replace the uri string with your MongoDB deployment's connection string.
-	uri := "mongodb+srv://selim:selim123@cluster0.d5a5q.mongodb.net/wordstore?retryWrites=true&w=majority"
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
-			panic(err)
-		}
-	}()
-
-	err = client.Ping(context.TODO(), nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	collection := client.Database("wordstore").Collection("words")
-	return collection, ctx
-}
 
 //GetClient is for connect mongodb
 func GetClient() *mongo.Client {
@@ -49,7 +23,7 @@ func GetClient() *mongo.Client {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected")
+	fmt.Println("Connected MongoDB")
 	return client
 }
 
