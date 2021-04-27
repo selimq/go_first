@@ -16,16 +16,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+}
+
 func get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "get called"}`))
 }
+
+/*
 func get1(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "text/plain")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(lib.Read()) //read
-}
+}*/
 
 func post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -210,6 +216,7 @@ func deleteWord(w http.ResponseWriter, r *http.Request) {
 
 }
 func listAllWords(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	log.Println("Listing All Words..")
@@ -247,7 +254,7 @@ func handleRequests() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "10000"
 	}
 	log.Println(port)
 	log.Fatal(http.ListenAndServe(":"+port, r))

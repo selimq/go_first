@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//Baglan s
+//Baglan is for connect mongo db server
 func Baglan() (*mongo.Collection, context.Context) {
 	// Replace the uri string with your MongoDB deployment's connection string.
 	uri := "mongodb+srv://selim:selim123@cluster0.d5a5q.mongodb.net/wordstore?retryWrites=true&w=majority"
@@ -37,17 +37,6 @@ func Baglan() (*mongo.Collection, context.Context) {
 	return collection, ctx
 }
 
-//CreateWord ..
-func CreateWord(ctx context.Context, collection mongo.Collection) {
-	print("123s")
-	word := lib.Word{ID: 3123}
-	ins, err := collection.InsertOne(context.TODO(), word)
-	if err != nil {
-		log.Fatal(err)
-	}
-	println(ins.InsertedID)
-}
-
 //GetClient is for connect mongodb
 func GetClient() *mongo.Client {
 	uri := "mongodb+srv://selim:selim123@cluster0.d5a5q.mongodb.net/wordstore?retryWrites=true&w=majority"
@@ -62,6 +51,17 @@ func GetClient() *mongo.Client {
 	}
 	fmt.Println("Connected")
 	return client
+}
+
+//CreateWord ..
+func CreateWord(ctx context.Context, collection mongo.Collection) {
+	print("123s")
+	word := lib.Word{ID: 3123}
+	ins, err := collection.InsertOne(context.TODO(), word)
+	if err != nil {
+		log.Fatal(err)
+	}
+	println(ins.InsertedID)
 }
 
 //InsertNewWord is
